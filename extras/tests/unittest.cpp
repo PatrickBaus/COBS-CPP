@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../cobs4.h"
+#include "../../src/cobs.h"
 
 #define ASSERT_EQUAL_LUINT(value, expected) \
 	do {\
@@ -35,7 +35,7 @@ bool test_encode_empty(void)
 	uint8_t expected_output[sizeof(buffer)] = {0x01, 0xAA, 0xAA};
 	uint8_t nBytes = 0;
 
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 
 	ASSERT_EQUAL_LUINT(encoded_length, nBytes + 1);
 	ASSERT_EQUAL_MEM(buffer, expected_output, sizeof(buffer));
@@ -51,7 +51,7 @@ bool test_encode_single_zero(void)
 	uint8_t expected_output[sizeof(buffer)] = {0x01, 0x01, 0xAA};
 	uint8_t nBytes = 1;
 
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 
 	ASSERT_EQUAL_LUINT(encoded_length, nBytes + 1);
 	ASSERT_EQUAL_MEM(buffer, expected_output, sizeof(buffer));
@@ -65,7 +65,7 @@ bool test_encode_single_BB(void)
 	uint8_t expected_output[sizeof(buffer)] = {0x02, 0xBB, 0xAA};
 	uint8_t nBytes = 1;
 
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 
 	ASSERT_EQUAL_LUINT(encoded_length, nBytes + 1);
 	ASSERT_EQUAL_MEM(buffer, expected_output, sizeof(buffer));
@@ -79,7 +79,7 @@ bool test_encode_one_zeros(void)
 	uint8_t expected_output[sizeof(buffer)] = {0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x02, 0x01, 0x01, 0xAA};
 	uint8_t nBytes = 8; 
 
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 
 	ASSERT_EQUAL_LUINT(encoded_length, nBytes + 1);
 	ASSERT_EQUAL_MEM(buffer, expected_output, sizeof(buffer));
@@ -110,7 +110,7 @@ bool test_encode_254_bytes_non_zero(void)
 	expected_output[255] = 0xAA;
   uint8_t nBytes = 254;
 
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 
 	ASSERT_EQUAL_LUINT(encoded_length, 254 + 1);
 	ASSERT_EQUAL_MEM(buffer, expected_output, 255);
@@ -129,7 +129,7 @@ bool test_encode_255_bytes_fail(void)
 	uint8_t expected_output[sizeof(buffer)];
 	uint8_t nBytes = 255;
 
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 
 	// We are expecting an error, therefore size 0
 	ASSERT_EQUAL_LUINT(encoded_length, 0);
@@ -153,7 +153,7 @@ bool test_encode_decode_single_zero(void) {
 	printf("\n");
 
 	// Now encode the packet
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 	ASSERT_EQUAL_LUINT(encoded_length, 2);
 
 	printf("\tEncoded (%lu byte(s)):\n", encoded_length);
@@ -163,7 +163,7 @@ bool test_encode_decode_single_zero(void) {
 	}
 	printf("\n");
 
-	size_t decoded_length = COBS::decode(buffer, encoded_length);
+	size_t decoded_length = cobs::decode(buffer, encoded_length);
 	printf("\tDecoded (%lu byte(s)):\n", decoded_length);
 	printf("\t");
 	for (int i = 0; i < decoded_length; i++) {
@@ -192,7 +192,7 @@ bool test_encode_decode_single_one(void) {
 	printf("\n");
 
 	// Now encode the packet
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 	ASSERT_EQUAL_LUINT(encoded_length, 2);
 
 	printf("\tEncoded (%lu byte(s)):\n", encoded_length);
@@ -202,7 +202,7 @@ bool test_encode_decode_single_one(void) {
 	}
 	printf("\n");
 
-	size_t decoded_length = COBS::decode(buffer, encoded_length);
+	size_t decoded_length = cobs::decode(buffer, encoded_length);
 
 	printf("\tDecoded (%lu byte(s)):\n", decoded_length);
 	printf("\t");
@@ -233,7 +233,7 @@ bool test_encode_decode_one_zeros(void)
 	printf("\n");
 
 	// Now encode the packet
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 	ASSERT_EQUAL_LUINT(encoded_length, 9);
 
 	printf("\tEncoded (%lu byte(s)):\n", encoded_length);
@@ -243,7 +243,7 @@ bool test_encode_decode_one_zeros(void)
 	}
 	printf("\n");
 
-	size_t decoded_length = COBS::decode(buffer, encoded_length);
+	size_t decoded_length = cobs::decode(buffer, encoded_length);
 	printf("\tDecoded (%lu byte(s)):\n", decoded_length);
 	printf("\t");
 	for (int i = 0; i < decoded_length; i++) {
@@ -280,7 +280,7 @@ bool test_encode_decode_254_bytes_non_zero(void) {
 	printf("\n");
 
 	// Now encode the packet
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 	ASSERT_EQUAL_LUINT(encoded_length, 255);
 
 	printf("\tEncoded (%lu byte(s)):\n", encoded_length);
@@ -290,7 +290,7 @@ bool test_encode_decode_254_bytes_non_zero(void) {
 	}
 	printf("\n");
 
-	size_t decoded_length = COBS::decode(buffer, encoded_length);
+	size_t decoded_length = cobs::decode(buffer, encoded_length);
 	printf("\tDecoded (%lu byte(s)):\n", decoded_length);
 	printf("\t");
 	for (int i = 0; i < decoded_length; i++) {
@@ -319,7 +319,7 @@ bool test_encode_decode_byte_code(void) {
 	printf("\n");
 
 	// Now encode the packet
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 	ASSERT_EQUAL_LUINT(encoded_length, 5);
 
 	printf("\tEncoded (%lu byte(s)):\n", encoded_length);
@@ -329,7 +329,7 @@ bool test_encode_decode_byte_code(void) {
 	}
 	printf("\n");
 
-	size_t decoded_length = COBS::decode(buffer, encoded_length);
+	size_t decoded_length = cobs::decode(buffer, encoded_length);
 
 	printf("\tDecoded (%lu byte(s)):\n", decoded_length);
 	printf("\t");
@@ -360,7 +360,7 @@ bool test_encode_decode_two_byte(void) {
 	printf("\n");
 
 	// Now encode the packet
-	size_t encoded_length = COBS::encode(buffer, nBytes, 1);
+	size_t encoded_length = cobs::encode(buffer, nBytes, 1);
 	ASSERT_EQUAL_LUINT(encoded_length, 3);
 
 	printf("\tEncoded (%lu byte(s)):\n", encoded_length);
@@ -370,7 +370,7 @@ bool test_encode_decode_two_byte(void) {
 	}
 	printf("\n");
 
-	size_t decoded_length = COBS::decode(buffer, encoded_length);
+	size_t decoded_length = cobs::decode(buffer, encoded_length);
 
 	printf("\tDecoded (%lu byte(s)):\n", decoded_length);
 	printf("\t");
