@@ -27,8 +27,7 @@
 #include <stdint.h>	 // uint8_t, etc.
 #include <stddef.h>	 // size_t
 
-namespace cobs
-{
+namespace cobs {
     /**
      * In place COBS encoder. The maximum block size is 254, because for larger
      * packets, inplace encoding becomes inefficient. This arises from the fact
@@ -116,5 +115,5 @@ namespace cobs
         return size -1;
     }
 }   // Namespace cobs
-#endif
+#endif    // End of header
 
