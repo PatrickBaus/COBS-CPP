@@ -2,6 +2,7 @@
  *
  * Redistribution and use in source and binary forms are permitted, with or without modification.
  */
+#ifndef ARDUINO
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -407,3 +408,4 @@ int main(int argc, char*argv[])
 	printf("Done!\n");
 	return 0;
 }
+#endif
