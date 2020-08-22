@@ -46,8 +46,8 @@ namespace cobs {
      * buffer must be one additional byte.
      * @return The ecoded size of the data
      */
-    static const size_t encode(uint8_t* buffer, const size_t size, const size_t offset) __attribute__((unused));
-    static const size_t encode(uint8_t* buffer, const size_t size, const size_t offset) {
+    static size_t encode(uint8_t* buffer, const size_t size, const size_t offset) __attribute__((unused));
+    static size_t encode(uint8_t* buffer, const size_t size, const size_t offset) {
       // Error out if the message larger than the maximum block size of
       // the COBS algorithm (254). The reason for this is that, this code
       // does not handle multiple blocks.
@@ -94,8 +94,8 @@ namespace cobs {
      * @param size The size of the buffer
      *@return The block size, which is size -1
      */
-    static const size_t decode(uint8_t* buffer, const size_t size) __attribute__((unused));
-    static const size_t decode(uint8_t* buffer, const size_t size) {
+    static size_t decode(uint8_t* buffer, const size_t size) __attribute__((unused));
+    static size_t decode(uint8_t* buffer, const size_t size) {
         // All COBS encoded blocks contain at least the header, even encoded empty
         // packets (size > 1). We have limited the maximum size of a message to 
         // size of of 254 bytes (unencoded), reasonable for microcontrollers.
