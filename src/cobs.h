@@ -47,7 +47,7 @@ namespace cobs {
      * @return The ecoded size of the data
      */
     static size_t encode(uint8_t* buffer, const size_t size) __attribute__((unused));
-    static size_t encode(uint8_t* startOfData, const size_t size) {
+    static size_t encode(uint8_t* buffer, const size_t size) {
       // Error out if the message larger than the maximum block size of
       // the COBS algorithm (254). The reason for this is, that this code
       // does not handle multiple blocks.
