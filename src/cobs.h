@@ -40,46 +40,47 @@ namespace cobs {
     /**
      * Encode an input array of byte with the COBS algorithm.
      *
-     * @param input The input buffer. Must be at least of length (size + 1)!
+     * @param buffer The i/o buffer. Must be at least of length $(size + 1) and the additional byte must be at the beginning of the data.
      * @param size of the data to be encoded. Must be at least
-     * zero and no greater than 254. The memory allocated for the input
+     * one and no greater than 254. The memory allocated for the input
      * buffer must be one additional byte.
      * @return The ecoded size of the data
      */
-    static size_t encode(uint8_t* buffer, const size_t size, const size_t offset) __attribute__((unused));
-    static size_t encode(uint8_t* buffer, const size_t size, const size_t offset) {
+    static size_t encode(uint8_t* buffer, const size_t size) __attribute__((unused));
+    static size_t encode(uint8_t* startOfData, const size_t size) {
       // Error out if the message larger than the maximum block size of
-      // the COBS algorithm (254). The reason for this is that, this code
+      // the COBS algorithm (254). The reason for this is, that this code
       // does not handle multiple blocks.
-      if (size > 254)
+      if (size > 254 or size < 1)
   	    return 0;
 
-      uint8_t* startOfData = buffer + offset;
-      uint8_t* endOfBlock = &startOfData[size-1];
+      uint8_t* endOfBlock = &buffer[size-1];
       uint8_t* cursor;
       // Write a 0 before the data block. This is the COBS overhead byte.
-      // This 0x00 byte will be overwritten later, but stops the parser.
-      *(startOfData -1) = 0x00;
+      // This 0x00 byte will be overwritten later, but also serves as a
+      // terminator for the parser.
+      *(buffer -1) = 0x00;
 
       do {
-          // Loook for a 0x00 byte starting from the back of the stream
-          // This loop is the reason why we need to put a 0x00 byte before the
-          // data block. Checking for bounds on every iteration is costly.
+          // Search for a 0x00 byte starting from the back of the stream.
+          // This is the reason why we needed to prepend the 0x00 byte to the
+          // data block. It serves as a terminator and saves us a bounds check while
+          // iterating the loop.
           for (cursor = endOfBlock; *cursor != 0x00; cursor--) {};
           // 0x00 0xXX 0xXX 0xXX 0xYY 0xXX 0xXX 0xXX ....
           //   ^             ^     ^
           //   |             |     |
           // cursor   endOfBlock   was 0x00
-          *cursor = endOfBlock - cursor + 1;		// The number of bytes til the next zero
-          // The next block ends in front of the cursor (if there is another block)
+          *cursor = endOfBlock - cursor + 1;		// Calculate the number of bytes until the next 0x00 byte
+          // Go to the next block and repeat
           endOfBlock = cursor - 1;
-      } while (cursor > startOfData);
+      } while (cursor > buffer);
 
-      // If the first DATA byte was 0x00, then the loop will abort after encoding
+      // If the first data byte was 0x00, then the loop will abort after encoding
       // this block, so we need to manually check our overhead byte. If it still
       // says 0x00, then the loop aborted.
-      if (*(startOfData - 1) == 0x00) {
-          *(startOfData - 1) = 0x01;
+      if (*(buffer - 1) == 0x00) {
+          *(buffer - 1) = 0x01;
       }
       return size + 1;
     }
@@ -92,7 +93,7 @@ namespace cobs {
      * After decoding the buffer will contain the data without the overhead byte.
      * The overhead byte is the first byte, so the data stream will have an offset of +1.
      * @param size The size of the buffer
-     *@return The block size, which is size -1
+     *@return The block size, which is size - 1
      */
     static size_t decode(uint8_t* buffer, const size_t size) __attribute__((unused));
     static size_t decode(uint8_t* buffer, const size_t size) {
@@ -100,7 +101,7 @@ namespace cobs {
         // packets (size > 1). We have limited the maximum size of a message to 
         // size of of 254 bytes (unencoded), reasonable for microcontrollers.
         // Therefore a maximum of 255 encoded bytes has been set.
-        if (size < 1 || size > 255)
+        if (size < 1 or size > 255)
             return 0;
 
         uint8_t tmp = 0;
@@ -112,7 +113,7 @@ namespace cobs {
             buffer += tmp;		// If we are out of bounds, this will be the last iteration
         } while(buffer < endOfBuffer);
 
-        return size -1;
+        return size - 1;
     }
 }   // Namespace cobs
 #endif    // End of header
