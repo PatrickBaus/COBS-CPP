@@ -42,7 +42,7 @@ namespace cobs {
      *
      * @param buffer The i/o buffer. The data must start at index 1. Index 0 will be overwritten with the overhead byte
      * @param size of the buffer to be encoded. Must be at least
-     * two and not greater than 255 The size of the data block must be at most 254 bytes, because one
+     * one and not greater than 255 The size of the data block must be at most 254 bytes, because one
      * byte is the overhead byte
      * @return The ecoded size of the data
      */
@@ -97,7 +97,7 @@ namespace cobs {
     static size_t decode(uint8_t* buffer, const size_t size) __attribute__((unused));
     static size_t decode(uint8_t* buffer, const size_t size) {
         // All COBS encoded blocks contain at least the header, even encoded empty
-        // packets (size == 1). The maximum size of a message is limieted to
+        // packets (size == 1). The maximum size of a message is limited to
         // 254 bytes (unencoded). Therefore the maximum input size is 255 encoded bytes.
         if (size < 1 or size > 255)
             return 0;
