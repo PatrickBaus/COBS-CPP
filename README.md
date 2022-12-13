@@ -41,7 +41,7 @@ void setup() {
   Serial.println("00"); // Add the final delimiter to complete the message
 
   // Now decode the data again
-  cobs::decode(buffer, sizeof(buffer)-1);
+  cobs::decode(buffer, sizeof(buffer));
 
   Serial.print("Decoded data: ");
   printBuffer(buffer+1, sizeof(buffer)-1);
