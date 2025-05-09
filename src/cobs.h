@@ -24,8 +24,8 @@
 #ifndef COBS_CPP_H
 #define COBS_CPP_H
 
-#include <stdint.h>	 // uint8_t, etc.
-#include <stddef.h>	 // size_t
+#include <stdint.h>  // uint8_t, etc.
+#include <stddef.h>  // size_t
 
 namespace cobs {
     /**
@@ -52,7 +52,7 @@ namespace cobs {
       // the COBS algorithm (254). This code does not handle multiple blocks.
       // Also abort if there is only byte, because there is no data to encode.
       if (size > 255 or size < 1)
-  	    return 0;
+          return 0;
 
       uint8_t* endOfBlock = &buffer[size-1];
       // Write a 0 before the data block. This is the COBS overhead byte.
@@ -70,7 +70,7 @@ namespace cobs {
           //   ^             ^     ^
           //   |             |     |
           // cursor   endOfBlock   was 0x00
-          *cursor = endOfBlock - cursor + 1;		// Calculate the number of bytes until the next 0x00 byte
+          *cursor = endOfBlock - cursor + 1;  // Calculate the number of bytes until the next 0x00 byte
           // Go to the next block and repeat
           endOfBlock = cursor - 1;
       } while (cursor > buffer);
@@ -106,13 +106,13 @@ namespace cobs {
         uint8_t* endOfBuffer = buffer + size;
 
         do {
-            tmp = *buffer;   // Store the offset of the first encoded character
+            tmp = *buffer;  // Store the offset of the first encoded character
             *buffer = 0x00;
-            buffer += tmp;		// If we are out of bounds, this will be the last iteration
+            buffer += tmp;  // If we are out of bounds, this will be the last iteration
         } while(buffer < endOfBuffer);
 
         return size - 1;
     }
 }   // Namespace cobs
-#endif    // End of header
+#endif  // COBS_CPP_H
 
