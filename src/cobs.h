@@ -107,6 +107,7 @@ namespace cobs {
 
         do {
             tmp = *buffer;  // Store the offset of the first encoded character
+            if (tmp == 0) return 0;  // 0 offset is invalid
             *buffer = 0x00;
             buffer += tmp;  // If we are out of bounds, this will be the last iteration
         } while(buffer < endOfBuffer);

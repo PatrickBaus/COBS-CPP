@@ -400,6 +400,21 @@ bool test_encode_decode_two_byte(void) {
   return true;
 }
 
+bool test_decode_invalid(void) {
+  printf("Decode an invalid string with zero offset:\n");
+  uint8_t buffer[] = { '\0', };
+  // The number of bytes to be encoded
+  uint8_t nBytes = 1;
+
+  // Now decode the packet
+  size_t decoded_length = cobs::decode(buffer, nBytes);
+
+  printf("\tDecoded (%lu byte(s)):\n", decoded_length);
+
+  ASSERT_EQUAL_LUINT(decoded_length, 0);
+  return true;
+}
+
 int main(int argc, char*argv[])
 {
   printf("Testing encoder...\n");
@@ -419,6 +434,7 @@ int main(int argc, char*argv[])
   test_encode_decode_two_byte();
   test_encode_decode_254_bytes_non_zero();
   test_encode_decode_byte_code();
+  test_decode_invalid();
   printf("Done!\n");
   return 0;
 }
