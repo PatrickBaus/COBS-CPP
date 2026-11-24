@@ -1,15 +1,16 @@
 Consistent Overhead Byte Stuffing Library
 ===================
+[![CI](https://github.com/PatrickBaus/COBS-CPP/actions/workflows/ci.yml/badge.svg)](https://github.com/PatrickBaus/COBS-CPP/actions/workflows/ci.yml)
 
 This repository contains a fast C library of the [COBS](http://www.stuartcheshire.org/papers/COBSforToN.pdf) (Consistent Overhead Byte Stuffing) algorithm.
 It is designed for small embedded devices and the Internet of Things. When using any serial connection
 to transfer data, packet boundaries need to be unambiguous within the data stream.
 
-The COBS encoder works by reencoding a dataframe to remove a a certain byte (typically `0x00`), so that
+The COBS encoder works by reencoding a dataframe to remove a certain byte (typically `0x00`), so that
 this byte can then be used as a special marker to denote the end of a frame. The encoding is especially
 efficient and requires little computational resources.
 
-The implementation is both efficient and rquires little memory. It works in-place on the input data
+The implementation is both efficient and requires little memory. It works in-place on the input data
 to save memory, but it is limited to a single COBS frame of 254 bytes, which is typically more than
 enough for small devices.
 
@@ -52,10 +53,26 @@ void loop() {
 }
 ```
 
+Both functions return `0` in case of an error. `cobs::encode()` fails, if the size of the buffer is not in the range of 1 to 255 bytes.
+`cobs::decode()` additionally fails, if the data is not a valid COBS frame, because an offset byte is `0x00` or points beyond the end of
+the buffer (truncated frame). The content of the buffer is undefined after a failed `cobs::decode()`. Note, that decoding a valid, but
+empty frame (the single byte `0x01`) also returns a length of `0`.
+
 Installation
 -----
-Currently the library does not support the Arduino library manager, so it is highly recommended to copy the full library to a subfolder called
+Currently the library does not support the Arduino library manager, so either copy the repository to the `libraries` folder of your
+Arduino sketchbook and use `#include <cobs.h>` or copy [src/cobs.h](src/cobs.h) to your Arduino project and use `#include "cobs.h"`.
+
+Tests
+-----
+The unit tests are found in [extras/tests](extras/tests) and are run for every commit by the CI. They require `make` and a C++ compiler.
+[gcovr](https://gcovr.com/) is required for the coverage report. The build fails, if the line or branch coverage of the library drops
+below 100 %.
+
+```bash
+make -C extras/tests test
 ```
-src/
+
+```bash
+make -C extras/tests coverage
 ```
-within your Arduino project.

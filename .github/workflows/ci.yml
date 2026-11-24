@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit tests (${{ matrix.compiler }}, ${{ matrix.std }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [g++, clang++]
+        std: [c++11, c++17, c++20]
+    steps:
+      - uses: actions/checkout@v4
+      # Built with -Werror and run with the address and undefined behaviour sanitizers
+      - name: Build and run the unit tests
+        run: make -C extras/tests test CXX=${{ matrix.compiler }} CXXSTD=${{ matrix.std }}
+
+  coverage:
+    name: Coverage (100 % lines and branches)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gcovr
+        run: pipx install gcovr
+      # Fails if the line or the branch coverage of src/ is below 100 %
+      - name: Run the unit tests with coverage
+        run: make -C extras/tests coverage
+      - name: Add the coverage to the job summary
+        if: always()
+        run: |
+          gcovr --root . --filter src/ --object-directory extras/tests/build/coverage \
+            --markdown-summary "$GITHUB_STEP_SUMMARY" || true
+      - name: Upload the coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: extras/tests/build/coverage/*.html
+          if-no-files-found: ignore
+
+  arduino:
+    name: Arduino example (${{ matrix.fqbn }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        fqbn: ["arduino:avr:uno", "arduino:samd:mkrzero"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile the examples
+        uses: arduino/compile-sketches@v1
+        with:
+          fqbn: ${{ matrix.fqbn }}
+          libraries: |
+            - source-path: ./
+          sketch-paths: |
+            - examples
+          enable-warnings-report: false
+
+  arduino-lint:
+    name: Arduino Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/arduino-lint-action@v2
+        with:
+          library-manager: false
+          compliance: specification
