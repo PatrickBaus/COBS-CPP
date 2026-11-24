@@ -53,3 +53,6 @@ dkms.conf
 
 # Poject specific files
 unit_test
+
+# Unit test build output
+extras/tests/build/

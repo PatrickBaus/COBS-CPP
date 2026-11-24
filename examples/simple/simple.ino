@@ -1,4 +1,4 @@
-#include "cobs.h"
+#include <cobs.h>
 
 void printBuffer(uint8_t* buffer, size_t size) {
   for (uint8_t i = 0; i < size; i++) {
